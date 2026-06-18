@@ -2,8 +2,17 @@
 ## Title: VanillaRatingBuster
 ## Author: Kylosandrax, 2017
 ## Dependencies: BonusScanner
-## Notes: Displays ratings for items in tooltips based on stat weights 
-## Version: 0.11
+## Notes: Displays ratings for items in tooltips based on stat weights
+## Version: 0.12
 
 VanillaRatingBuster.lua
 VanillaRatingBusterWeights.lua
+weights/Druid.lua
+weights/Hunter.lua
+weights/Mage.lua
+weights/Paladin.lua
+weights/Priest.lua
+weights/Rogue.lua
+weights/Shaman.lua
+weights/Warlock.lua
+weights/Warrior.lua

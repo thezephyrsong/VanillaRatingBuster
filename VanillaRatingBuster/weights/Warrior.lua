@@ -1,4 +1,6 @@
 -- weights/Warrior.lua
+DEFAULT_CHAT_FRAME:AddMessage("SUCCESS: The game is reading Warrior.lua!")
+
 
 VRB_LABELS["Warrior"] = { "WarriorThreat-EP", "WarriorMitigation-EP", "WarriorFury-EP" }
 

@@ -1,4 +1,3 @@
-
 scoredItemTypes = {
   INVTYPE_2HWEAPON, INVTYPE_CHEST, INVTYPE_CLOAK,
   INVTYPE_FEET, INVTYPE_FINGER, INVTYPE_HAND, INVTYPE_HEAD, INVTYPE_HOLDABLE,
@@ -11,17 +10,14 @@ scoredItemTypes = {
   "Gun", "Wand", "Crossbow"
 }
 
-
 function istable(t)
   return type(t) == 'table'
 end
-
 
 function VRBRound(num, places)
   local mult = 10^(places or 0)
   return math.floor(num * mult + 0.5) / mult
 end
-
 
 function VRBCheckItemType(slot)
   for id, scoredSlot in pairs(scoredItemTypes) do
@@ -32,114 +28,133 @@ function VRBCheckItemType(slot)
   return nil
 end
 
-
 function VRBGetValidRatings()
   local ratings
-  local class = UnitClass("player")
+  -- Proper 1.12 API call returns LocalizedName, EnglishUPPERCASEName
+  local className, classFileName = UnitClass("player")
 
-  ratings = VRB_LABELS[class]
+  ratings = VRB_LABELS[className]
   if ratings then
     return ratings
   end
   return {}
-
 end
 
-
 function VRBCalculateRating(weightTable, bonuses)
-
   local baseScore = 0
-  local bonus, i;
   local weightTypes = VRB_WEIGHTS[weightTable]
-  local currentBonus = 0
 
-  for t,w in pairs(weightTypes) do
+  -- Safety catch: if the weights table isn't loaded, return 0 instead of crashing
+  if not weightTypes then return 0 end
 
-    if (BonusScanner.bonuses[t]) then
-      currentBonus = BonusScanner.bonuses[t]
-    end
-
-    if(bonuses[t]) then
-      -- Now check if the weight is a compound structure; has a threshold
+  for t, w in pairs(weightTypes) do
+    local itemBonus = bonuses[t]
+    if itemBonus then
       if istable(w) then
-        threshold = w[1]
-        beforeWeight = w[2]
-        afterWeight = w[3]
-        if tonumber(currentBonus) < tonumber(threshold) then
-          baseScore = baseScore + ( bonuses[t] * beforeWeight )
+        -- Threshold-based weight: { cap%, value_before_cap, value_after_cap }
+        -- Compare against the player's currently equipped total for this stat,
+        -- so we know whether the item pushes them toward or past the cap.
+        local threshold    = w[1] or 0
+        local beforeWeight = w[2] or 0
+        local afterWeight  = w[3] or 0
+
+        local equippedTotal = 0
+        if BonusScanner and BonusScanner.bonuses and BonusScanner.bonuses[t] then
+          equippedTotal = BonusScanner.bonuses[t]
+        end
+
+        if tonumber(equippedTotal) < tonumber(threshold) then
+          baseScore = baseScore + (itemBonus * beforeWeight)
         else
-          baseScore = baseScore + ( bonuses[t] * afterWeight )
+          baseScore = baseScore + (itemBonus * afterWeight)
         end
       else
-        baseScore = baseScore + ( bonuses[t] * w )
+        baseScore = baseScore + (itemBonus * tonumber(w))
       end
     end
-
   end
 
   return VRBRound(baseScore, 2)
-
 end
 
+-- Hook into the game's tooltip via a child frame.
+--
+-- VRBItemScoreTooltip is parented to GameTooltip, so whenever GameTooltip:Show()
+-- fires, OnShow also fires on this child frame. This lets us read the tooltip's
+-- lines and append our own without ever replacing/wrapping a Blizzard function,
+-- which means we never fight other addons over who hooks SetBagItem/SetInventoryItem
+-- first or last load order.
+--
+-- BonusScanner:ScanLine(line) is a real per-line scanning method (confirmed in
+-- BonusScanner.lua), so feeding it the tooltip's text lines directly is valid.
 
-VRBItemScoreTooltip = CreateFrame( "Frame" , "VRBItemScoreTooltip", GameTooltip )
-VRBItemScoreTooltip:SetScript("OnShow", function (self)
-    local itemLevel = nil
-    local itemRarity = nil
-    local itemSlot = nil
-    local itemName = nil
-    local itemID = nil
-    local bonuses = nil
-    local tmpTxt, line;
-    local lines = GameTooltip:NumLines();
-    local hasScoreToShow = false
-    local vrbscore = 0
-    local normalizedLabel = nil
+local VRB_isUpdating = false
 
-    BonusScanner.temp.sets = {};
-    BonusScanner.temp.set = "";
-    BonusScanner.temp.bonuses = {};
-    BonusScanner.temp.slot = "";
+VRBItemScoreTooltip = CreateFrame("Frame", "VRBItemScoreTooltip", GameTooltip)
+VRBItemScoreTooltip:SetScript("OnShow", function(self)
+    -- Prevent re-entrant calls (e.g. if AddDoubleLine below triggers another OnShow)
+    if VRB_isUpdating then return end
+    VRB_isUpdating = true
 
-    local lbl = getglobal("GameTooltipTextLeft1")
-    if lbl then
+    if not BonusScanner then
+        VRB_isUpdating = false
+        return
+    end
 
-      for i=2, lines, 1 do
-        tmpText = getglobal("GameTooltipTextLeft"..i);
-        val = nil;
-        if (tmpText:GetText()) then
-          line = tmpText:GetText();
-          BonusScanner:ScanLine(line);
+    local lines = GameTooltip:NumLines()
+
+    -- Gate: only proceed if this looks like an item tooltip (has a name line).
+    -- Unit tooltips, spell tooltips, etc. will still have GameTooltipTextLeft1
+    -- but BonusScanner's line patterns simply won't match anything on those,
+    -- so this is a soft guard rather than a strict one.
+    local titleLine = getglobal("GameTooltipTextLeft1")
+    if not titleLine or not titleLine:GetText() then
+        VRB_isUpdating = false
+        return
+    end
+
+    -- Reset scan state before reading this tooltip's lines
+    BonusScanner.temp.sets = {}
+    BonusScanner.temp.set = ""
+    BonusScanner.temp.bonuses = {}
+    BonusScanner.temp.slot = ""
+
+    for i = 2, lines do
+        local tmpText = getglobal("GameTooltipTextLeft" .. i)
+        if tmpText and tmpText:GetText() then
+            BonusScanner:ScanLine(tmpText:GetText())
         end
-      end
+    end
 
-      bonuses = BonusScanner.temp.bonuses;
-
-      if(bonuses) then
-
+    local bonuses = BonusScanner.temp.bonuses
+    if bonuses then
         local ratings = VRBGetValidRatings()
         local className, classFileName = UnitClass("player")
-        local color = RAID_CLASS_COLORS[classFileName]
+        if not classFileName then classFileName = string.upper(className) end
+        local color = RAID_CLASS_COLORS[classFileName] or { r=1, g=1, b=1 }
 
-        for _, r in ipairs(ratings) do
-          vrbscore = VRBCalculateRating(r, bonuses)
-          if vrbscore > 0 then
-            normalizedLabel = string.gsub(r, className, "")
-            -- GameTooltip:AddLine(normalizedLabel .. ": " .. vrbscore, color.r, color.g, color.b)
-            GameTooltip:AddDoubleLine(normalizedLabel .. ": ", vrbscore , color.r, color.g, color.b, color.r, color.g, color.b)
-            hasScoreToShow = true
-          end
+        local hasScoreToShow = false
+
+        -- NOTE: Lua 5.0 (WoW 1.12) has no ipairs() global, use pairs() instead.
+        for _, r in pairs(ratings) do
+            local vrbscore = VRBCalculateRating(r, bonuses)
+            if vrbscore > 0 then
+                GameTooltip:AddDoubleLine(
+                    r .. ": ",
+                    vrbscore,
+                    color.r, color.g, color.b,
+                    color.r, color.g, color.b
+                )
+                hasScoreToShow = true
+            end
         end
 
         if hasScoreToShow then
-          GameTooltip:Show()
+            GameTooltip:Show()
         end
-
-      end
-
     end
 
-  end)
-
+    VRB_isUpdating = false
+end)
 
 SLASH_VRBSCORE1, SLASH_VRBSCORE2 = '/vrb';

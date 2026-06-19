@@ -7,6 +7,7 @@
 
 VanillaRatingBuster.lua
 VanillaRatingBusterWeights.lua
+weights/Warrior.lua
 weights/Druid.lua
 weights/Hunter.lua
 weights/Mage.lua
@@ -15,4 +16,4 @@ weights/Priest.lua
 weights/Rogue.lua
 weights/Shaman.lua
 weights/Warlock.lua
-weights/Warrior.lua
+

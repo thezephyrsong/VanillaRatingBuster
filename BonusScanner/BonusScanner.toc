@@ -1,4 +1,4 @@
-## Interface: 11100
+## Interface: 11200
 ## Title: BonusScanner
 ## Notes: Scans your Equipment for cumulative item bonuses and sums them up.
 ## Notes-deDE: Durchsucht die Ausrüstung nach Gegenstandboni und zählt diese zusammen.

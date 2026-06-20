@@ -50,11 +50,12 @@ BONUSSCANNER_NAMES = {
 	HEALTH 		= "Life Points",
 	MANA 		= "Mana Points",
 
-	VAMPIRISM	= "Health Leech",-- custom health leech
-	SPELLSTRIKE	= "On Hit Elemental Damage",-- generic on-hit elemental damage
-	EXTRAATTACK	= "Chance To Proc Extra Attacks",-- extra weapon swing proc rate
-	FORTUNE		= "Chance To Proc Other Procs (On Gear)",-- proc amplification modifier
-	AVOIDANCE	= "AoE Damage Reduction", -- area of effect damage reduction
+	-- Turtle Stats
+	VAMPIRISM	= "Health Leech",
+	SPELLSTRIKE	= "On Hit Elemental Damage",
+	EXTRAATTACK	= "Chance To Proc Extra Attacks",
+	FORTUNE		= "Chance To Proc Other Procs (On Gear)",
+	AVOIDANCE	= "AoE Damage Reduction",
 };
 
 -- equip and set bonus prefixes:
@@ -85,23 +86,23 @@ BONUSSCANNER_PATTERNS_PASSIVE = {
 	{ pattern = "Increases damage done to Undead by magical spells and effects by up to (%d+)", effect = "DMGUNDEAD" },
 	{ pattern = "+(%d+) Attack Power when fighting Undead.", effect = "ATTACKPOWERUNDEAD" },
 	{ pattern = "Restores (%d+) health per 5 sec%.", effect = "HEALTHREG" }, 
-	{ pattern = "Restores (%d+) health every 5 sec%.", effect = "HEALTHREG" },  -- both versions ('per' and 'every') seem to be used
+	{ pattern = "Restores (%d+) health every 5 sec%.", effect = "HEALTHREG" },
 	{ pattern = "Restores (%d+) mana per 5 sec%.", effect = "MANAREG" },
 	{ pattern = "Restores (%d+) mana every 5 sec%.", effect = "MANAREG" },
 	{ pattern = "Improves your chance to hit by (%d+)%%%.", effect = "TOHIT" },
 	{ pattern = "Improves your chance to hit with spells by (%d+)%%%.", effect = "SPELLTOHIT" },
 	{ pattern = "Decreases the magical resistances of your spell targets by (%d+).", effect = "SPELLPEN" },
 	{ pattern = "Your attacks ignore (%d+) of the target's armor.", effect = "ARMORPEN" },
+	
+	-- Turtle Stat Patterns
 	{ pattern = "(%d+)%% of damage dealt is returned as healing", effect = "VAMPIRISM" },
-	{ pattern = "Adds (%d+) %%a+ damage to your melee attacks", effect = "SPELLSTRIKE" },
-	{ pattern = "Gives your melee attacks a (%d+)%% chance to grant %%d+ extra attack", effect = "EXTRAATTACK" },
+	{ pattern = "Adds (%d+) %a+ damage to your melee attacks", effect = "SPELLSTRIKE" },
+	{ pattern = "Gives your melee attacks a (%d+)%% chance to grant %d+ extra attack", effect = "EXTRAATTACK" },
 	{ pattern = "Increases your chance to trigger chance based item effects by (%d+)%%", effect = "FORTUNE" },
 	{ pattern = "Reduces the damage you take from area of effect attacks by (%d+)%%", effect = "AVOIDANCE" },
 };
 
-
 -- generic patterns have the form "+xx bonus" or "bonus +xx" with an optional % sign after the value.
-
 -- first the generic bonus string is looked up in the following table
 BONUSSCANNER_PATTERNS_GENERIC_LOOKUP = {
 	["All Stats"] 			= {"STR", "AGI", "STA", "INT", "SPI"},
@@ -130,7 +131,6 @@ BONUSSCANNER_PATTERNS_GENERIC_LOOKUP = {
 	["Spell Hit"]			= "SPELLTOHIT",
 	["Blocking"]			= "BLOCK",
 	["Ranged Attack Power"] = "RANGEDATTACKPOWER",
-	["Ranged Attack Power"] = "RANGEDATTACKPOWER",
 	["health every 5 sec"] = "HEALTHREG",
 	["Healing Spells"] 		= "HEAL",
 	["Increases Healing"] 	= "HEAL",
@@ -148,7 +148,7 @@ BONUSSCANNER_PATTERNS_GENERIC_LOOKUP = {
 	["Mana"]				= "MANA",
 	["Armor"]				= "ARMOR",
 	["Reinforced Armor"]	= "ARMOR",
-};	
+};
 
 -- next we try to match against one pattern of stage 1 and one pattern of stage 2 and concatenate the effect strings
 BONUSSCANNER_PATTERNS_GENERIC_STAGE1 = {

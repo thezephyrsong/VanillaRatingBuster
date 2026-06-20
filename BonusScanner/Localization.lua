@@ -50,11 +50,11 @@ BONUSSCANNER_NAMES = {
 	HEALTH 		= "Life Points",
 	MANA 		= "Mana Points"
 
-VAMPIRISM	 = "Health Leech"-- custom health leech
-SPELLSTRIKE	 = "On Hit Elemental Damage"-- generic on-hit elemental damage
-EXTRAATTACK = "Chance To Proc Extra Attacks"-- extra weapon swing proc rate
-FORTUNE		= "Chance To Proc Other Procs (On Gear)"-- proc amplification modifier
-AVOIDANCE = "AoE Damage Reduction" -- area of effect damage reduction
+	VAMPIRISM	 = "Health Leech"-- custom health leech
+	SPELLSTRIKE	 = "On Hit Elemental Damage"-- generic on-hit elemental damage
+	EXTRAATTACK = "Chance To Proc Extra Attacks"-- extra weapon swing proc rate
+	FORTUNE		= "Chance To Proc Other Procs (On Gear)"-- proc amplification modifier
+	AVOIDANCE = "AoE Damage Reduction" -- area of effect damage reduction
 };
 
 -- equip and set bonus prefixes:

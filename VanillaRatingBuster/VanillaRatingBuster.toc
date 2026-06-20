@@ -1,9 +1,11 @@
 ## Interface: 11200
 ## Title: VanillaRatingBuster
 ## Author: ZephZae - continued from Kylosandrax, 2017
+## SavedVariables: VRBOptionsDB
 ## Dependencies: BonusScanner
 ## Notes: Displays ratings for items in tooltips based on stat weights
-## Version: 0.2
+## Version: 0.3
 
 VanillaRatingBuster.lua
 VanillaRatingBusterWeights.lua
+VanillaRatingBusterOptions.lua

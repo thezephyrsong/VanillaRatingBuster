@@ -98,6 +98,11 @@
 
 -- "SPELLPEN", -- amount of spell resist reduction
 
+--		"VAMPIRISM",	-- custom health leech
+--		"SPELLSTRIKE",	-- generic on-hit elemental damage
+--		"EXTRAATTACK",	-- extra weapon swing proc rate
+--		"FORTUNE",		-- proc amplification modifier
+--		"AVOIDANCE",	-- area of effect damage reduction
 --
 
 -- "HEALTHREG", -- health regeneration per 5 sec.
@@ -119,11 +124,11 @@ VRB_LABELS["Warrior"] = { "WarriorThreat-EP", "WarriorMitigation-EP", "WarriorFu
 
 VRB_LABELS["Mage"] = { "MageArcane-EP", "MageFire-EP", "MageFrost-EP" }
 
-VRB_LABELS["Hunter"] = { "HunterMM-EP", "HunterBM-EP", "HunterSurv-EP" }
+VRB_LABELS["Hunter"] = { "HunterMM-EP", "HunterBM-EP", "HunterSurvST-EP", "HunterSurvAoE-EP" }
 
-VRB_LABELS["Druid"] = { "DruidFeralDPS-EP", "DruidTank-EP", "DruidThreat-EP", "DruidResto-EP" }
+VRB_LABELS["Druid"] = { "DruidFeralDPS-EP", "DruidTank-EP", "DruidThreat-EP", "DruidResto-EP", "DruidBoomkin-EP" }
 
-VRB_LABELS["Paladin"] = { "PaladinProtEH", "PaladinRetDPS", "PaladinHEP" }
+VRB_LABELS["Paladin"] = { "PaladinProtEH", "PaladinProtThreat-EP", "PaladinRetDPS", "PaladinHEP" }
 
 VRB_LABELS["Priest"] = { "PriestHEP_2M", "PriestHEP_15M", "PriestHEP_TIG", "PriestShadowDPS_2M", "PriestShadowDPS_9M" }
 
@@ -152,11 +157,13 @@ VRB_WEIGHTS["MageFrost-EP"] = { ["DMG"] = 1.00, ["FROSTDMG"] = 1.00, ["INT"] = 0
 
 
 
-VRB_WEIGHTS["PaladinRetDPS"] = { ["STR"] = 0.1428571428571429, ["AGI"] = 0.1020, ["CRIT"] = 2.04, ["TOHIT"] = { 5.6, 100, 0 }, ["ATTACKPOWER"] = 0.0714285714285714 }
+VRB_WEIGHTS["PaladinRetDPS"] = { ["STR"] = 0.1428571428571429, ["AGI"] = 0.1020, ["CRIT"] = 2.04, ["TOHIT"] = { 5.6, 100, 0 }, ["ATTACKPOWER"] = 0.0714285714285714, ["SPELLSTRIKE"] = 0.45 } -- SPELLSTRIKE added: flat dmg/swing doesn't scale w/ weapon speed like AP does, so it's not a clean swap with ATTACKPOWER -- roughly ATTACKPOWER * (14/weaponspeed) as a baseline AP-equivalent, then bumped up since it crits off spell crit (a stat Ret otherwise doesn't itemize) and also triggers JoW + Vengeance on top. First-pass estimate, refine with testing.
 
-VRB_WEIGHTS["PaladinHEP"] = { ["INT"] = 1.00, ["MANAREG"] = 1.91, ["HEAL"] = 1.00, ["SPELLCRIT"] = 20.34, ["SPI"] = 0.00 }
+VRB_WEIGHTS["PaladinHEP"] = { ["INT"] = 1.00, ["MANAREG"] = 1.91, ["HEAL"] = 1.00, ["SPELLCRIT"] = 20.34, ["SPI"] = 0.20 } -- SPI was 0.00; Holy BIS sets carry 32-54 spirit, set to small nonzero pending in-game validation
 
 VRB_WEIGHTS["PaladinProtEH"] = { ["ARMOR"] = 0.51416, ["STA"] = 10.14596, ["AGI"] = 1.02832, ["STR"] = 0.05, ["DODGE"] = 0, ["PARRY"] = 0, ["DEFENSE"] = 0.08, ["BLOCK"] = 0.04 }
+
+VRB_WEIGHTS["PaladinProtThreat-EP"] = { ["ARMOR"] = 0.10, ["STA"] = 1.00, ["AGI"] = 0.50, ["STR"] = 0.10, ["ATTACKPOWER"] = 1.00, ["CRIT"] = 15.00, ["DEFENSE"] = 0.10, ["BLOCK"] = 0.04, ["TOHIT"] = { 9, 25, 0 }, ["SPELLSTRIKE"] = 6.00 } -- new profile; matches Prot Threat BIS sets (notable AP/Crit alongside Stam/Defense, unlike pure-EH Mit sets). SPELLSTRIKE added: same AP-equivalent logic as PaladinRetDPS but scaled to this table's ATTACKPOWER=1.00 baseline, with extra weight since JoW mana return helps Holy Shield upkeep and Vengeance is a threat-relevant proc for a tank specifically. First-pass estimate, refine with testing.
 
 
 
@@ -166,9 +173,9 @@ VRB_WEIGHTS["PriestHEP_2M"] = { ["INT"] = 2.322635135, ["MANAREG"] = 3.5, ["HEAL
 
 VRB_WEIGHTS["PriestHEP_15M"] = { ["INT"] = 0.4351, ["MANAREG"] = 3.5, ["HEAL"] = 1, ["SPELLCRIT"] = 1.161317565, ["SPI"] = 0.8275 }
 
-VRB_WEIGHTS["PriestShadowDPS_2M"] = { ["DMG"] = 1, ["SHADOWDMG"] = 1, ["INT"] = 1.52, ["MANAREG"] = 1.8, ["SPI"] = 0.34, ["SPELLCRIT"] = 1.25, ["SPELLTOHIT"] = { 8, 10.36, 0 } }
+VRB_WEIGHTS["PriestShadowDPS_2M"] = { ["DMG"] = 1, ["SHADOWDMG"] = 1, ["INT"] = 1.52, ["MANAREG"] = 1.8, ["SPI"] = 0.34, ["SPELLCRIT"] = 1.25, ["SPELLTOHIT"] = { 8, 10.36, 0 }, ["SPELLPEN"] = 0.30 } -- SPELLPEN added; low priority since most raid bosses near-0 shadow resist, scale up for specific resist-heavy fights
 
-VRB_WEIGHTS["PriestShadowDPS_9M"] = { ["DMG"] = 1, ["SHADOWDMG"] = 1, ["INT"] = 0.4, ["MANAREG"] = 2.81, ["SPI"] = 0.09, ["SPELLCRIT"] = 0.88, ["SPELLTOHIT"] = { 8, 10.02, 0 } }
+VRB_WEIGHTS["PriestShadowDPS_9M"] = { ["DMG"] = 1, ["SHADOWDMG"] = 1, ["INT"] = 0.4, ["MANAREG"] = 2.81, ["SPI"] = 0.09, ["SPELLCRIT"] = 0.88, ["SPELLTOHIT"] = { 8, 10.02, 0 }, ["SPELLPEN"] = 0.20 } -- SPELLPEN added, same caveat
 
 
 
@@ -202,18 +209,22 @@ VRB_WEIGHTS["WarlockFire-EP"] = { ["DMG"] = 1.00, ["FIREDMG"] = 1.00, ["SHADOWDM
 
 
 
-VRB_WEIGHTS["HunterMM-EP"] = { ["AGI"] = 1.00, ["RANGEDATTACKPOWER"] = 0.52, ["ATTACKPOWER"] = 0.30, ["CRIT"] = 22.00, ["RANGEDCRIT"] = 22.00, ["TOHIT"] = { 7, 25.00, 0 }, ["HASTE"] = 10.00, ["STA"] = 0.10, ["STR"] = 0.05,}
+VRB_WEIGHTS["HunterMM-EP"] = { ["AGI"] = 1.00, ["RANGEDATTACKPOWER"] = 0.52, ["ATTACKPOWER"] = 0.30, ["CRIT"] = 22.00, ["RANGEDCRIT"] = 22.00, ["TOHIT"] = { 8, 25.00, 0 }, ["HASTE"] = 10.00, ["STA"] = 0.10, ["STR"] = 0.05,} -- TOHIT cap 7->8, Turtle WoW hunter hit cap confirmed at 8% per server FAQ
 
-VRB_WEIGHTS["HunterBM-EP"] = {["AGI"] = 1.00, ["RANGEDATTACKPOWER"] = 0.45, ["ATTACKPOWER"] = 0.40, ["CRIT"] = 23.00, ["RANGEDCRIT"] = 23.00, ["TOHIT"] = { 7, 25.00, 0 }, ["HASTE"] = 7.00, ["STA"] = 0.10, ["STR"] = 0.05,}
+VRB_WEIGHTS["HunterBM-EP"] = {["AGI"] = 1.00, ["RANGEDATTACKPOWER"] = 0.45, ["ATTACKPOWER"] = 0.40, ["CRIT"] = 23.00, ["RANGEDCRIT"] = 23.00, ["TOHIT"] = { 8, 25.00, 0 }, ["HASTE"] = 7.00, ["STA"] = 0.10, ["STR"] = 0.05,} -- TOHIT cap 7->8. Note: CRIT/RANGEDATTACKPOWER implies ~51 eAP per 1% crit, above FAQ's stated 30-42 eAP range - worth re-checking, left as-is pending further testing
 
-VRB_WEIGHTS["HunterSurv-EP"] = {["AGI"] = 1.20, ["ATTACKPOWER"] = 0.50, ["RANGEDATTACKPOWER"] = 0.30, ["CRIT"] = 22.00, ["RANGEDCRIT"] = 18.00, ["TOHIT"] = { 7, 25.00, 0 }, ["HASTE"] = 7.00, ["STA"] = 0.10, ["STR"] = 0.08,}
+VRB_WEIGHTS["HunterSurvST-EP"] = {["AGI"] = 1.20, ["ATTACKPOWER"] = 0.65, ["RANGEDATTACKPOWER"] = 0.30, ["CRIT"] = 22.00, ["RANGEDCRIT"] = 18.00, ["TOHIT"] = { 8, 25.00, 0 }, ["HASTE"] = 7.00, ["STA"] = 0.10, ["STR"] = 0.15,} -- single-target/dual-wield Survival; ATTACKPOWER and STR raised vs old HunterSurv-EP (0.50/0.08) to reflect the 2nd weapon swing - K40 Surv Axe BIS itemizes ~2x the Strength of the 2H set
+
+VRB_WEIGHTS["HunterSurvAoE-EP"] = {["AGI"] = 1.20, ["ATTACKPOWER"] = 0.50, ["RANGEDATTACKPOWER"] = 0.30, ["CRIT"] = 22.00, ["RANGEDCRIT"] = 18.00, ["TOHIT"] = { 8, 25.00, 0 }, ["HASTE"] = 7.00, ["STA"] = 0.10, ["STR"] = 0.08,} -- multi-target/cleave Survival (2H/polearm), values carried over from old HunterSurv-EP which was already closer to this itemization
 
 
 
 VRB_WEIGHTS["DruidResto-EP"] = { ["HEAL"] = 1.00, ["DMG"] = 1.00, ["INT"] = 0.3, ["SPI"] = 0.46, ["MANAREG"] = 3.0, ["SPELLCRIT"] = 10, ["MANA"] = 0.02,}
 
-VRB_WEIGHTS["DruidFeralDPS-EP"] = { ["AGI"] = 2.76, ["ARMORPEN"] = 0.5, ["ATTACKPOWER"] = 1, ["CRIT"] = 30.13, ["FERALATTACKPOWER"] = 1, ["HASTE"] = 13.6, ["STR"] = 2.64, ["TOHIT"] = 31.85,}
+VRB_WEIGHTS["DruidFeralDPS-EP"] = { ["AGI"] = 3.20, ["ARMORPEN"] = 0.5, ["ATTACKPOWER"] = 1, ["CRIT"] = 30.13, ["FERALATTACKPOWER"] = 1, ["HASTE"] = 13.6, ["STR"] = 2.10, ["TOHIT"] = 31.85,} -- AGI raised from 2.76, STR lowered from 2.64: Cat BIS consistently runs ~1.4-1.5x more AGI than STR, STR brought to ~2x ATTACKPOWER (1 STR = 2 AP) baseline
 
 VRB_WEIGHTS["DruidTank-EP"] = { ["AGI"] = 1.57, ["ARMOR"] = 0.33, ["ARMORPEN"] = 0.5, ["ATTACKPOWER"] = 1, ["CRIT"] = 25.8, ["DEFENSE"] = 0.46, ["FERALATTACKPOWER"] = 1, ["HASTE"] = 26.6, ["HEALTH"] = 0.167, ["STA"] = 2.2, ["STR"] = 2.2, ["TOHIT"] = 36.1}
 
 VRB_WEIGHTS["DruidThreat-EP"] = { ["AGI"] = 1.57, ["ARMORPEN"] = 0.5, ["ATTACKPOWER"] = 1, ["CRIT"] = 25.8, ["FERALATTACKPOWER"] = 1, ["HASTE"] = 26.6, ["STR"] = 2.2, ["TOHIT"] = 36.1}
+
+VRB_WEIGHTS["DruidBoomkin-EP"] = { ["DMG"] = 1.00, ["ARCANEDMG"] = 1.00, ["NATUREDMG"] = 1.00, ["INT"] = 0.35, ["SPI"] = 0.30, ["SPELLCRIT"] = 18.00, ["SPELLTOHIT"] = { 16, 18.00, 0 }, ["HASTE"] = 9.00, ["MANAREG"] = 2.00, ["SPELLPEN"] = 1.00, ["STA"] = 0.05 } -- new profile; Starfire/Moonfire are Arcane, Wrath is Nature, so both dmg types weighted equally to DMG. K40 Boomkin BIS itemizes 10 spell pen, included.

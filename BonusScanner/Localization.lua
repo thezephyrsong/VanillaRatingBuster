@@ -49,12 +49,6 @@ BONUSSCANNER_NAMES = {
 	MANAREG 	= "Mana Regeneration",
 	HEALTH 		= "Life Points",
 	MANA 		= "Mana Points"
-
-VAMPIRISM	 = "Health Leech"-- custom health leech
-SPELLSTRIKE	 = "On Hit Elemental Damage"-- generic on-hit elemental damage
-EXTRAATTACK = "Chance To Proc Extra Attacks"-- extra weapon swing proc rate
-FORTUNE		= "Chance To Proc Other Procs (On Gear)"-- proc amplification modifier
-AVOIDANCE = "AoE Damage Reduction" -- area of effect damage reduction
 };
 
 -- equip and set bonus prefixes:
@@ -92,11 +86,6 @@ BONUSSCANNER_PATTERNS_PASSIVE = {
 	{ pattern = "Improves your chance to hit with spells by (%d+)%%%.", effect = "SPELLTOHIT" },
 	{ pattern = "Decreases the magical resistances of your spell targets by (%d+).", effect = "SPELLPEN" },
 	{ pattern = "Your attacks ignore (%d+) of the target's armor.", effect = "ARMORPEN" }
-	{ pattern = "(%d+)%% of damage dealt is returned as healing", effect = "VAMPIRISM" },
-	{ pattern = "Adds (%d+) %%a+ damage to your melee attacks", effect = "SPELLSTRIKE" },
-	{ pattern = "Gives your melee attacks a (%d+)%% chance to grant %%d+ extra attack", effect = "EXTRAATTACK" },
-	{ pattern = "Increases your chance to trigger chance based item effects by (%d+)%%", effect = "FORTUNE" },
-	{ pattern = "Reduces the damage you take from area of effect attacks by (%d+)%%", effect = "AVOIDANCE" },
 };
 
 

@@ -90,7 +90,13 @@ BonusScanner = {
 		"MANAREG",		-- mana regeneration per 5 sec.
 		"HEALTH",		-- health points
 		"MANA",			-- mana points
-	};
+
+  "VAMPIRISM",	-- custom health leech
+		"SPELLSTRIKE",	-- generic on-hit elemental damage
+		"EXTRAATTACK",	-- extra weapon swing proc rate
+		"FORTUNE",		-- proc amplification modifier
+		"AVOIDANCE",	-- area of effect damage reduction
+	};
 
 	slots = {
 		"Head",

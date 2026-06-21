@@ -48,7 +48,14 @@ BONUSSCANNER_NAMES = {
 	HEALTHREG 	= "Life Regeneration",
 	MANAREG 	= "Mana Regeneration",
 	HEALTH 		= "Life Points",
-	MANA 		= "Mana Points"
+	MANA 		= "Mana Points",
+
+	-- Turtle Stats
+	VAMPIRISM	= "Health Leech",
+	SPELLSTRIKE	= "On Hit Elemental Damage",
+	EXTRAATTACK	= "Chance To Proc Extra Attacks",
+	FORTUNE		= "Chance To Proc Other Procs (On Gear)",
+	AVOIDANCE	= "AoE Damage Reduction"
 };
 
 -- equip and set bonus prefixes:
@@ -85,7 +92,13 @@ BONUSSCANNER_PATTERNS_PASSIVE = {
 	{ pattern = "Improves your chance to hit by (%d+)%%%.", effect = "TOHIT" },
 	{ pattern = "Improves your chance to hit with spells by (%d+)%%%.", effect = "SPELLTOHIT" },
 	{ pattern = "Decreases the magical resistances of your spell targets by (%d+).", effect = "SPELLPEN" },
-	{ pattern = "Your attacks ignore (%d+) of the target's armor.", effect = "ARMORPEN" }
+	{ pattern = "Your attacks ignore (%d+) of the target's armor.", effect = "ARMORPEN" },
+	-- Turtle Stat Patterns
+	{ pattern = "(%d+)%% of damage dealt is returned as healing", effect = "VAMPIRISM" },
+	{ pattern = "Adds (%d+) %a+ damage to your melee attacks", effect = "SPELLSTRIKE" },
+	{ pattern = "Gives your melee attacks a (%d+)%% chance to grant %d+ extra attack", effect = "EXTRAATTACK" },
+	{ pattern = "Increases your chance to trigger chance based item effects by (%d+)%%", effect = "FORTUNE" },
+	{ pattern = "Reduces the damage you take from area of effect attacks by (%d+)%%", effect = "AVOIDANCE" }
 };
 
 
